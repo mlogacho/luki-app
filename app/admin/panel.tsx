@@ -12,6 +12,11 @@ export default function AdminPanel() {
     const router = useRouter();
 
     useEffect(() => {
+        // Load channels from API on mount (supports page refresh)
+        useAdminStore.getState().init();
+    }, []);
+
+    useEffect(() => {
         if (!isAdminAuth) router.replace('/admin' as any);
     }, [isAdminAuth]);
 

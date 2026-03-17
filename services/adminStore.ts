@@ -46,16 +46,14 @@ async function apiSave(channels: Channel[]): Promise<void> {
     } catch {}
 }
 
-let initialized = false;
-
-export const useAdminStore = create<AdminState>()((set) => ({
+export const useAdminStore = create<AdminState>()((set, get) => ({
     channels: [],
     isAdminAuth: false,
     _hasHydrated: false,
 
     init: async () => {
-        if (initialized) return;
-        initialized = true;
+        // No-op if already loaded in this session
+        if (get()._hasHydrated) return;
         const channels = await apiLoad();
         set({ channels, _hasHydrated: true });
     },
