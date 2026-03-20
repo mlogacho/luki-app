@@ -1,9 +1,9 @@
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
-import { Movie } from '../services/contentStore';
+import type { Channel } from '@/src/core/types/channel.types';
 
 interface MediaRowProps {
     title: string;
-    items: Movie[];
+    items: Channel[];
 }
 
 export const MediaRow = ({ title, items }: MediaRowProps) => {
@@ -16,7 +16,7 @@ export const MediaRow = ({ title, items }: MediaRowProps) => {
                 renderItem={({ item }) => (
                     <TouchableOpacity className="mr-4 first:ml-4">
                         <Image
-                            source={{ uri: item.poster }}
+                            source={{ uri: item.imageUrl }}
                             className="w-32 h-48 rounded-md"
                             resizeMode="cover"
                         />

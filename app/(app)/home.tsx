@@ -1,11 +1,12 @@
 import { View, ScrollView, RefreshControl, StatusBar } from 'react-native';
 import { useEffect, useCallback, useMemo } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { useContentStore, Movie } from '../../services/contentStore';
-import { useAdminStore } from '../../services/adminStore';
-import { Hero } from '../../components/Hero';
-import { MediaRow } from '../../components/MediaRow';
+import { useContentStore } from '@/src/modules/content/store/contentStore';
+import { useAdminStore } from '@/services/adminStore';
+import { Hero } from '@/components/Hero';
+import { MediaRow } from '@/components/MediaRow';
 import { useRouter } from 'expo-router';
+import type { Channel } from '@/src/core/types/channel.types';
 
 // Order in which tag rows appear when present
 const TAG_ORDER = [
@@ -16,11 +17,11 @@ const TAG_ORDER = [
 ];
 
 export default function Home() {
-    const { featured: hardcodedFeatured, trending: hardcodedTrending, fetchContent, isLoading } = useContentStore();
+    const { channels: contentChannels, featuredChannel, fetchChannels, isLoading } = useContentStore();
     const adminChannels = useAdminStore((state) => state.channels);
     const router = useRouter();
 
-    // Load channels from IndexedDB once on mount
+    // Load admin channels from API on mount
     useEffect(() => {
         useAdminStore.getState().init();
     }, []);
@@ -28,47 +29,39 @@ export default function Home() {
     // Re-fetch base content on focus
     useFocusEffect(
         useCallback(() => {
-            fetchContent();
+            fetchChannels();
         }, [])
     );
 
-    // Wait for Zustand to rehydrate from IndexedDB before merging admin channels
+    // Wait for admin channels to hydrate before merging
     const hasHydrated = useAdminStore((state) => state._hasHydrated);
     const effectiveAdminChannels = hasHydrated ? adminChannels : [];
 
-    // Convert admin channels to Movie shape
-    const adminMovies: Movie[] = useMemo(() => effectiveAdminChannels.map((ch) => ({
-        id: ch.id,
-        title: ch.title,
-        poster: ch.imageUrl,
-        backdrop: ch.imageUrl,
-        description: ch.description || '',
-        videoUrl: ch.videoUrl,
-        tags: ch.tags || [],
-    })), [effectiveAdminChannels]);
-
-    const featured = adminMovies.length > 0 ? adminMovies[0] : hardcodedFeatured;
+    // Admin channels take priority; only show active channels
+    const featured: Channel | null = effectiveAdminChannels.find((ch) => ch.isActive) ??
+        effectiveAdminChannels[0] ??
+        (featuredChannel ?? null);
 
     // Merge all content — admin first (priority)
-    const allMovies: Movie[] = useMemo(
-        () => [...adminMovies, ...hardcodedTrending],
-        [adminMovies, hardcodedTrending]
+    const allChannels: Channel[] = useMemo(
+        () => [...effectiveAdminChannels, ...contentChannels],
+        [effectiveAdminChannels, contentChannels]
     );
 
     // Build tag → items map dynamically
-    const tagRows: { title: string; items: Movie[] }[] = useMemo(() => {
-        const rows: { title: string; items: Movie[] }[] = [];
+    const tagRows: { title: string; items: Channel[] }[] = useMemo(() => {
+        const rows: { title: string; items: Channel[] }[] = [];
 
         // "Tendencias Globales" always shows everything
-        if (allMovies.length > 0) {
-            rows.push({ title: 'Tendencias Globales', items: allMovies });
+        if (allChannels.length > 0) {
+            rows.push({ title: 'Tendencias Globales', items: allChannels });
         }
 
         // One row per tag (only those that actually have content)
         const seen = new Set<string>();
         for (const tag of TAG_ORDER.slice(1)) {
             if (seen.has(tag)) continue;
-            const items = allMovies.filter((m) => m.tags?.includes(tag));
+            const items = allChannels.filter((ch) => ch.tags?.includes(tag));
             if (items.length > 0) {
                 seen.add(tag);
                 rows.push({ title: tag, items });
@@ -77,18 +70,18 @@ export default function Home() {
 
         // Catch-all for items with tags not in TAG_ORDER
         const extraTags = new Set<string>();
-        for (const m of allMovies) {
-            for (const t of m.tags ?? []) {
+        for (const ch of allChannels) {
+            for (const t of ch.tags ?? []) {
                 if (!TAG_ORDER.includes(t) && !seen.has(t)) extraTags.add(t);
             }
         }
         for (const tag of extraTags) {
-            const items = allMovies.filter((m) => m.tags?.includes(tag));
+            const items = allChannels.filter((ch) => ch.tags?.includes(tag));
             if (items.length > 0) rows.push({ title: tag, items });
         }
 
         return rows;
-    }, [allMovies]);
+    }, [allChannels]);
 
     const handlePlay = () => {
         if (featured) {
@@ -102,7 +95,7 @@ export default function Home() {
             <ScrollView
                 className="flex-1"
                 refreshControl={
-                    <RefreshControl refreshing={isLoading} onRefresh={fetchContent} tintColor="#FFC107" />
+                    <RefreshControl refreshing={isLoading} onRefresh={fetchChannels} tintColor="#FFC107" />
                 }
             >
                 {featured && <Hero movie={featured} onPlay={handlePlay} />}

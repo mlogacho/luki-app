@@ -1,99 +1,74 @@
 import { create } from 'zustand';
+import { httpClient } from '@/src/shared/api/httpClient';
+import type { Channel } from '@/src/core/types/channel.types';
 
-export interface Channel {
-    id: string;
-    title: string;
-    imageUrl: string;
-    videoUrl: string;
-    description: string;
-    tags: string[];
-    createdAt: number;
+export type { Channel };
+
+interface AdminChannelInput {
+  title: string;
+  videoUrl: string;
+  imageUrl: string;
+  description: string;
+  tags: string[];
 }
 
 interface AdminState {
-    channels: Channel[];
-    isAdminAuth: boolean;
-    _hasHydrated: boolean;
-    init: () => Promise<void>;
-    adminLogin: (password: string) => boolean;
-    adminLogout: () => void;
-    addChannel: (data: Omit<Channel, 'id' | 'createdAt'>) => void;
-    updateChannel: (id: string, data: Partial<Omit<Channel, 'id' | 'createdAt'>>) => void;
-    deleteChannel: (id: string) => void;
+  channels: Channel[];
+  _hasHydrated: boolean;
+
+  init: () => Promise<void>;
+  addChannel: (data: AdminChannelInput) => void;
+  updateChannel: (id: string, data: Partial<AdminChannelInput>) => void;
+  deleteChannel: (id: string) => void;
 }
 
-const ADMIN_PASS = 'luki2024';
-const API_URL = '/api/channels';
+export const useAdminStore = create<AdminState>((set, get) => ({
+  channels: [],
+  _hasHydrated: false,
 
-async function apiLoad(): Promise<Channel[]> {
+  init: async () => {
+    if (get()._hasHydrated) return;
     try {
-        const res = await fetch(API_URL);
-        if (!res.ok) return [];
-        return await res.json();
-    } catch { return []; }
-}
+      const channels = await httpClient.get<Channel[]>('/channels');
+      set({ channels, _hasHydrated: true });
+    } catch {
+      set({ _hasHydrated: true });
+    }
+  },
 
-async function apiSave(channels: Channel[]): Promise<void> {
-    try {
-        await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ADMIN_PASS}`,
-            },
-            body: JSON.stringify(channels),
-        });
-    } catch {}
-}
+  addChannel: (data: AdminChannelInput) => {
+    const channel: Channel = {
+      ...data,
+      id: `ch-${Date.now()}`,
+      category: '',
+      isActive: true,
+      allowedPlanIds: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    set((state) => ({ channels: [channel, ...state.channels] }));
+    httpClient.post<Channel>('/channels', channel).catch(() => {
+      // Optimistic update — server sync is best-effort
+    });
+  },
 
-export const useAdminStore = create<AdminState>()((set, get) => ({
-    channels: [],
-    isAdminAuth: false,
-    _hasHydrated: false,
+  updateChannel: (id: string, data: Partial<AdminChannelInput>) => {
+    set((state) => ({
+      channels: state.channels.map((ch) =>
+        ch.id === id
+          ? { ...ch, ...data, updatedAt: new Date().toISOString() }
+          : ch
+      ),
+    }));
+    httpClient.put<Channel>(`/channels/${id}`, data).catch(() => {});
+  },
 
-    init: async () => {
-        // No-op if already loaded in this session
-        if (get()._hasHydrated) return;
-        const channels = await apiLoad();
-        set({ channels, _hasHydrated: true });
-    },
-
-    adminLogin: (password) => {
-        if (password === ADMIN_PASS) {
-            set({ isAdminAuth: true });
-            return true;
-        }
-        return false;
-    },
-
-    adminLogout: () => set({ isAdminAuth: false }),
-
-    addChannel: (data) => {
-        set((state) => {
-            const channels = [
-                { ...data, id: `ch-${Date.now()}`, createdAt: Date.now() },
-                ...state.channels,
-            ];
-            apiSave(channels);
-            return { channels };
-        });
-    },
-
-    updateChannel: (id, data) => {
-        set((state) => {
-            const channels = state.channels.map((ch) =>
-                ch.id === id ? { ...ch, ...data } : ch
-            );
-            apiSave(channels);
-            return { channels };
-        });
-    },
-
-    deleteChannel: (id) => {
-        set((state) => {
-            const channels = state.channels.filter((ch) => ch.id !== id);
-            apiSave(channels);
-            return { channels };
-        });
-    },
+  deleteChannel: (id: string) => {
+    set((state) => ({
+      channels: state.channels.filter((ch) => ch.id !== id),
+    }));
+    httpClient.delete<void>(`/channels/${id}`).catch(() => {});
+  },
 }));
+
+
