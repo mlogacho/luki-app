@@ -81,11 +81,14 @@ Desde tu **sesión SSH en el servidor**, ejecuta este bloque tal cual —
 detecta automáticamente si ya existe el repositorio:
 
 ```bash
+cd ~   # asegurarse de no estar DENTRO de ~/luki-app antes de cualquier operación
+
 if [ -d "$HOME/luki-app/.git" ]; then
   # El repo ya existe → solo traer cambios
   cd ~/luki-app && git pull
 else
-  # Primera vez → clonar
+  # Primera vez (o directorio huérfano) → borrar y clonar
+  rm -rf ~/luki-app
   git clone https://github.com/mlogacho/luki-app.git ~/luki-app
 fi
 
@@ -93,10 +96,11 @@ fi
 cd ~/luki-app/backend
 ```
 
-> **¿Error "already exists and is not an empty directory"?**
-> Significa que hay una carpeta `~/luki-app` pero sin historial de git.
-> Elimínala y vuelve a ejecutar el bloque de arriba:
+> **¿Error "Unable to read current working directory"?**
+> Ocurre cuando ejecutas `rm -rf ~/luki-app` estando DENTRO de esa carpeta.
+> Vuelve al directorio home **primero** y repite:
 > ```bash
+> cd ~
 > rm -rf ~/luki-app
 > git clone https://github.com/mlogacho/luki-app.git ~/luki-app
 > cd ~/luki-app/backend
