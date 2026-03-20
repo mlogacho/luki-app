@@ -102,8 +102,8 @@ luki-app/
 ```
 app/index.tsx
   │
-  ├── authStore.isAuthenticated === true  →  /(app)/home
-  └── authStore.isAuthenticated === false →  /(auth)/login
+  ├── authStore.user !== null  →  /(app)/home
+  └── authStore.user === null  →  /(auth)/login
                                                  │
                                         authStore.login(email, password)
                                           [mock: cualquier @email + 12345]

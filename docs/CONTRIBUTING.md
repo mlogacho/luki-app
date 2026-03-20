@@ -112,7 +112,7 @@ docs(architecture): actualizar diagrama de módulos
 ### NativeWind / Tailwind
 
 - Usar los tokens `luki-*` para colores de la marca.
-- No usar estilos inline (`style={{}}`) cuando exista clase Tailwind equivalente.
+- Preferir clases Tailwind; usar `style={{}}` solo cuando sea necesario por compatibilidad o APIs de React Native.
 - Para lógica de clases condicionales, usar `clsx` + `tailwind-merge`.
 
 ### Nomenclatura

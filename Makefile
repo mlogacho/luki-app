@@ -3,7 +3,7 @@
 # Targets de desarrollo, build y mantenimiento.
 # =============================================================================
 
-.PHONY: setup run web ios android build test clean freeze help
+.PHONY: setup run web ios android build deploy-prod test clean freeze help
 
 # ── Ayuda ─────────────────────────────────────────────────────────────────────
 help: ## Muestra esta ayuda
@@ -30,6 +30,9 @@ android: ## Inicia Expo con emulador Android
 # ── Build ─────────────────────────────────────────────────────────────────────
 build: ## Exporta la versión web estática (salida en dist/)
 	npx expo export --platform web
+
+deploy-prod: ## Build + deploy web a servidor Nginx por SSH
+	bash scripts/deploy-prod.sh
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
 test: ## Ejecuta la suite de tests con Jest

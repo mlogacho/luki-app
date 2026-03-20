@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../services/authStore';
 import { useEffect } from 'react';
@@ -32,7 +32,6 @@ export default function Index() {
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFD700' }}>
             <ActivityIndicator size="large" color="#000000" />
-            <Text style={{ color: 'black', marginTop: 20, fontSize: 20, fontWeight: 'bold' }}>DEBUG MODE: JS IS RUNNING</Text>
         </View>
     );
 }

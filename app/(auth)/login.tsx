@@ -16,7 +16,7 @@ import { useRouter } from 'expo-router';
  *
  * State:
  * - `email`    — controlled email input.
- * - `password` — controlled password input (default '12345' for dev convenience).
+ * - `password` — controlled password input.
  * - `error`    — inline error message string.
  *
  * Dependencies:
@@ -25,7 +25,7 @@ import { useRouter } from 'expo-router';
  */
 export default function Login() {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('12345');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
 
@@ -57,10 +57,6 @@ export default function Login() {
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-center">
 
             <View className="items-center mb-12">
-                {/* DEBUG BOX: Verify NativeWind */}
-                <View className="w-20 h-20 bg-red-500 mb-4 justify-center items-center">
-                    <Text className="text-white font-bold">DEBUG</Text>
-                </View>
                 <View className="flex-row items-center">
                     {/* Logo Placeholder Simulation */}
                     <View className="mr-2">

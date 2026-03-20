@@ -77,7 +77,19 @@ Instala la app **Expo Go** en el dispositivo y escanea el QR que muestra el CLI.
 
 ---
 
-## Builds de producción (EAS Build)
+## Builds de producción
+
+### Recomendado (web en servidor propio)
+
+Para este repositorio, la vía recomendada de publicación web es el script automatizado:
+
+```bash
+make deploy-prod
+```
+
+Ver detalles en la sección **Despliegue automatizado a servidor Nginx (producción)**.
+
+### Opcional (builds nativos con EAS)
 
 Los builds de producción se gestionan con **Expo Application Services (EAS)**.
 
@@ -135,6 +147,66 @@ O conectar el repositorio desde el dashboard de Vercel y configurar:
 - **Build command**: `npx expo export --platform web`
 - **Output directory**: `dist`
 - **Framework preset**: Other
+
+---
+
+## Despliegue automatizado a servidor Nginx (producción)
+
+El repositorio incluye un script para desplegar la exportación web en un servidor Linux con Nginx.
+
+### Flujo que ejecuta
+
+1. Genera build web con `npx expo export --platform web` (salvo que uses `--skip-build`)
+2. Empaqueta `dist/` y lo sube por SSH
+3. Crea backup remoto de `/var/www/luki-app`
+4. Reemplaza archivos publicados
+5. Recarga Nginx
+6. Ejecuta healthcheck de frontend y API
+7. Si falla healthcheck, hace rollback automático (cuando hay backup)
+
+### Comando recomendado
+
+```bash
+bash scripts/deploy-prod.sh --key /Users/tu_usuario/.ssh/bot.pem
+```
+
+### Variables/opciones importantes
+
+- `--host` (default: `3.135.214.120`)
+- `--user` (default: `admin`)
+- `--key` (default: `$HOME/.ssh/bot.pem`)
+- `--web-port` (default: `8070`)
+- `--api-path` (default: `/api/channels`)
+- `--remote-root` (default: `/var/www/luki-app`)
+- `--skip-build` (usa el `dist/` actual sin compilar)
+- `--no-backup` (omite backup remoto; no recomendado)
+
+También puedes usar variables de entorno equivalentes:
+
+```bash
+HOST=3.135.214.120 \
+SSH_USER=admin \
+SSH_KEY=/Users/tu_usuario/.ssh/bot.pem \
+WEB_PORT=8070 \
+API_PATH=/api/channels \
+REMOTE_ROOT=/var/www/luki-app \
+bash scripts/deploy-prod.sh
+```
+
+### Atajo con Makefile
+
+```bash
+make deploy-prod
+```
+
+### Validación post-deploy
+
+```bash
+ssh -i /ruta/clave.pem admin@<host> \
+"curl -sS -i http://127.0.0.1:8070/api/channels | head -n 8"
+```
+
+Deberías ver `HTTP/1.1 200 OK` y `Content-Type: application/json`.
 
 ---
 
@@ -199,6 +271,7 @@ eas secret:create --scope project --name MY_SECRET --value "valor"
 | `make setup` | Instala dependencias y copia `.env.example` |
 | `make run` | Inicia Expo en modo desarrollo |
 | `make build` | Exporta la versión web estática |
+| `make deploy-prod` | Publica la versión web en servidor Nginx por SSH |
 | `make test` | Ejecuta la suite de tests con Jest |
 | `make clean` | Limpia `node_modules/`, `dist/`, `.expo/` |
 
