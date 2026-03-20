@@ -77,12 +77,21 @@ sudo npm install -g pm2
 
 ### 4. Subir el código del servidor a la instancia
 
-Desde tu computadora local, ejecuta esto (ajusta la ruta si el repositorio está en otro lugar):
+Desde tu computadora local, **primero ve a la carpeta raíz del repositorio** y luego ejecuta el `scp`:
 
 ```bash
-# Sube solo la carpeta backend/
-scp -i tu-clave.pem -r /ruta/local/luki-app/backend admin@3.135.214.120:~/luki-server
+# 1. Entra a la carpeta raíz del repositorio (donde está la subcarpeta backend/)
+cd /ruta/local/luki-app   # ajusta esta ruta a donde clonaste el repo
+
+# 2. Comprueba que la carpeta backend/ existe aquí
+ls backend/
+
+# 3. Sube la carpeta backend/ al servidor
+scp -i bot.pem -r ./backend admin@3.135.214.120:~/luki-server
 ```
+
+> ⚠️ El error `No such file or directory` aparece cuando ejecutas el `scp` desde una carpeta
+> que **no** contiene `backend/`. Asegúrate de estar en la raíz del repositorio antes de ejecutar el comando.
 
 ---
 
