@@ -3,6 +3,16 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '../services/authStore';
 import { useEffect } from 'react';
 
+/**
+ * Application entry-point / auth-redirect gate.
+ *
+ * Reads the current auth state from {@link useAuthStore} and after a short
+ * delay redirects to the appropriate route:
+ * - Authenticated user → `/(app)/home`
+ * - Unauthenticated user → `/(auth)/login`
+ *
+ * Shows an activity indicator while the redirect is being prepared.
+ */
 export default function Index() {
     const user = useAuthStore((state) => state.user);
     const router = useRouter();

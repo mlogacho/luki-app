@@ -7,6 +7,22 @@ import { useRouter } from 'expo-router';
 import { useAdminStore } from '../../services/adminStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+/**
+ * Admin login screen.
+ *
+ * Renders a password-only form that validates credentials via
+ * {@link useAdminStore.adminLogin}. On success, redirects to the Admin Panel.
+ * The password field supports a show/hide toggle.
+ *
+ * State:
+ * - `password` — controlled password input.
+ * - `showPass`  — toggles password visibility.
+ * - `error`     — inline error message.
+ * - `loading`   — whether the login action is in progress.
+ *
+ * Side effect: Watches `isAdminAuth` to redirect immediately when auth state
+ * changes externally (e.g. after page reload with persisted session).
+ */
 export default function AdminLogin() {
     const [password, setPassword] = useState('');
     const [showPass, setShowPass] = useState(false);

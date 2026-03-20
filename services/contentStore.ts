@@ -1,6 +1,18 @@
 import { create } from 'zustand';
 import { useAdminStore } from './adminStore';
 
+/**
+ * Represents a content item (movie, series episode, or live channel).
+ *
+ * @property id          - Unique content identifier.
+ * @property title       - Display title.
+ * @property poster      - Portrait image URL (used in MediaRow cards).
+ * @property backdrop    - Wide/landscape image URL (used in Hero).
+ * @property description - Short synopsis or description.
+ * @property videoUrl    - HLS (.m3u8), MP4, or live stream URL.
+ * @property rating      - Optional audience relevance score label.
+ * @property tags        - Genre or category labels for display rows.
+ */
 export interface Movie {
     id: string;
     title: string;
@@ -12,6 +24,16 @@ export interface Movie {
     tags?: string[];
 }
 
+/**
+ * Shape of the content Zustand store.
+ *
+ * @property featured     - Hero item displayed at the top of the home screen.
+ * @property trending     - Ordered list of content for row display.
+ * @property action       - Secondary content list used for category rows.
+ * @property isLoading    - Whether content is being fetched.
+ * @property fetchContent - Loads hardcoded content and merges admin channels.
+ * @property getMovieById - Returns a Movie by id from any list, or undefined.
+ */
 interface ContentState {
     featured: Movie | null;
     trending: Movie[];
@@ -21,6 +43,15 @@ interface ContentState {
     getMovieById: (id: string) => Movie | undefined;
 }
 
+/**
+ * Global content store (Zustand).
+ *
+ * Manages the catalogue displayed across the app. On fetch, admin-managed
+ * channels are merged and given priority over the hardcoded catalogue.
+ *
+ * External dependency: {@link useAdminStore} — reads channels persisted
+ * via the admin API endpoint (/api/channels).
+ */
 export const useContentStore = create<ContentState>((set, get) => ({
     featured: null,
     trending: [],

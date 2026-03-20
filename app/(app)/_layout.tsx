@@ -1,6 +1,16 @@
 import { Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+/**
+ * Layout for the authenticated (app) route group.
+ *
+ * Renders a bottom tab navigator with three tabs:
+ * - **Inicio** (`home`)    — main catalogue screen.
+ * - **Buscar** (`search`)  — search screen (placeholder).
+ * - **Mi Lista** (`favorites`) — saved content list (placeholder).
+ *
+ * Tab bar styling follows the LUKI dark-purple design system.
+ */
 export default function AppLayout() {
     return (
         <Tabs

@@ -7,6 +7,22 @@ import { Button } from '../../components/Button';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 
+/**
+ * Login screen for end users.
+ *
+ * Collects email and password, validates them client-side, and delegates
+ * authentication to {@link useAuthStore}. On success, navigates to
+ * `/(app)/home`. Displays inline error messages on validation or auth failure.
+ *
+ * State:
+ * - `email`    — controlled email input.
+ * - `password` — controlled password input (default '12345' for dev convenience).
+ * - `error`    — inline error message string.
+ *
+ * Dependencies:
+ * - `useAuthStore.login` — performs mock authentication.
+ * - `expo-linear-gradient` — renders the purple gradient background.
+ */
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('12345');

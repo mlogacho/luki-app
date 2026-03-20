@@ -6,6 +6,22 @@ import { useEffect } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
+/**
+ * Root layout component for the entire application.
+ *
+ * Responsible for:
+ * - Importing global NativeWind CSS.
+ * - Preventing the splash screen from hiding automatically.
+ * - Hiding the splash screen after a 500 ms grace period.
+ * - Defining the root `Stack` navigator with all top-level route groups.
+ *
+ * Route groups registered:
+ * - `index`  — auth redirect gate
+ * - `(auth)` — unauthenticated flows (login)
+ * - `(app)`  — authenticated main tab area
+ * - `admin`  — administration panel
+ * - `player` — fullscreen video player
+ */
 export default function RootLayout() {
   useEffect(() => {
     const timer = setTimeout(() => {

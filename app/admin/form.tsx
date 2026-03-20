@@ -60,6 +60,29 @@ const LABEL_STYLE = {
 
 const ERROR_STYLE = { color: '#f87171', fontSize: 12, marginTop: 5 } as const;
 
+/**
+ * Add / Edit channel form for the Admin Panel.
+ *
+ * When the route param `id` is present the form operates in edit mode and
+ * pre-populates fields from the existing channel. Without `id` it creates
+ * a new channel.
+ *
+ * Fields:
+ * - `title`        — required channel display name.
+ * - `videoUrl`     — required stream URL (HLS, MP4, or live).
+ * - `imageUrl`     — required cover image (URL or base64 from file upload).
+ * - `description`  — optional channel synopsis.
+ * - `selectedTags` — multi-select genre tags from `PRESET_TAGS`.
+ *
+ * Image modes (web only for upload):
+ * - "URL"    — direct image URL input.
+ * - "Upload" — file picker with client-side JPEG compression (max 800 px, 0.75 quality).
+ *
+ * On save, calls `addChannel` or `updateChannel` from {@link useAdminStore}
+ * and navigates back to `/admin/panel`.
+ *
+ * Route protection: Redirects to `/admin` when `isAdminAuth` is false.
+ */
 export default function AdminForm() {
     const { id } = useLocalSearchParams<{ id?: string }>();
     const router = useRouter();

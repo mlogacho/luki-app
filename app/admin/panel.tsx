@@ -7,6 +7,23 @@ import { useRouter } from 'expo-router';
 import { useAdminStore, Channel } from '../../services/adminStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+/**
+ * Admin Panel screen — channel list management.
+ *
+ * Displays all persisted channels as cards with thumbnail, title, stream URL
+ * and genre tags. Provides per-channel edit and delete actions.
+ *
+ * Actions:
+ * - "Agregar" — navigates to `/admin/form` (new channel).
+ * - Edit icon  — navigates to `/admin/form?id=<channelId>` (edit mode).
+ * - Trash icon — confirms deletion via `Alert.alert` then calls `deleteChannel`.
+ * - Logout icon — calls `adminLogout` and redirects to the admin login.
+ *
+ * Route protection: Redirects to `/admin` when `isAdminAuth` becomes false.
+ *
+ * Dependencies:
+ * - `useAdminStore` — reads channels, deleteChannel, adminLogout.
+ */
 export default function AdminPanel() {
     const { channels, deleteChannel, adminLogout, isAdminAuth } = useAdminStore();
     const router = useRouter();

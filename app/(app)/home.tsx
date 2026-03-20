@@ -15,6 +15,22 @@ const TAG_ORDER = [
     'Comedia', 'Terror', 'Drama', 'Sci-Fi', 'Anime',
 ];
 
+/**
+ * Home screen — main catalogue view for authenticated users.
+ *
+ * Displays a {@link Hero} banner for the featured item and dynamically
+ * generated {@link MediaRow} rows grouped by tag/genre.
+ *
+ * Behaviour:
+ * - Initialises admin channels from the API on mount.
+ * - Refreshes catalogue content every time the screen comes into focus.
+ * - Admin channels are merged with priority over hardcoded content.
+ * - Rows are ordered according to `TAG_ORDER`; extra tags are appended.
+ *
+ * State dependencies:
+ * - `useContentStore` — featured item and trending list.
+ * - `useAdminStore`   — admin-managed channels.
+ */
 export default function Home() {
     const { featured: hardcodedFeatured, trending: hardcodedTrending, fetchContent, isLoading } = useContentStore();
     const adminChannels = useAdminStore((state) => state.channels);

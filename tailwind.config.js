@@ -1,4 +1,14 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * Tailwind CSS configuration for LUKI App.
+ *
+ * - `content` scans all TypeScript/TSX files so unused classes are purged in
+ *   production builds.
+ * - `theme.extend.colors` adds LUKI brand tokens (`luki-*`) that can be used
+ *   as Tailwind utility classes anywhere in the codebase.
+ * - NativeWind reads this file to generate the CSS that Metro bundles.
+ *
+ * @type {import('tailwindcss').Config}
+ */
 module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],

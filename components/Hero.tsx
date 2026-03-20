@@ -6,11 +6,25 @@ import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
 
+/**
+ * Props for the {@link Hero} component.
+ *
+ * @property movie   - The featured {@link Movie} to promote.
+ * @property onPlay  - Callback fired when the user taps the Play button.
+ */
 interface HeroProps {
     movie: Movie;
     onPlay: () => void;
 }
 
+/**
+ * Full-width hero banner displayed at the top of the Home screen.
+ *
+ * Renders the movie backdrop with a gradient overlay and overlaid metadata
+ * (title, tags). Exposes a Play action that triggers navigation to the Player.
+ *
+ * @param props - {@link HeroProps}
+ */
 export const Hero = ({ movie, onPlay }: HeroProps) => {
     const [imgError, setImgError] = useState(false);
 

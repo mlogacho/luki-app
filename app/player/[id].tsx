@@ -8,7 +8,16 @@ import { useAdminStore } from '../../services/adminStore';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 
-// Web-only HLS player using hls.js
+/**
+ * Web-only HLS video player wrapper using hls.js.
+ *
+ * Uses native HLS support (Safari) when available, otherwise loads hls.js
+ * dynamically for Chrome/Firefox/Edge. Renders a native `<video>` element
+ * with a back button overlay.
+ *
+ * @param url    - HLS or MP4 stream URL to play.
+ * @param onBack - Callback for the back button press.
+ */
 function WebHLSPlayer({ url, onBack }: { url: string; onBack: () => void }) {
     const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -61,6 +70,27 @@ function WebHLSPlayer({ url, onBack }: { url: string; onBack: () => void }) {
     );
 }
 
+/**
+ * Video player screen.
+ *
+ * Resolves the stream URL in priority order:
+ *  1. Admin channel matching the `id` route param.
+ *  2. Content store movie matching the `id` route param.
+ *  3. Hardcoded featured item URL.
+ *  4. Fallback HLS demo stream.
+ *
+ * On native (iOS/Android), locks screen orientation to landscape on mount
+ * and restores portrait on unmount. Uses `expo-av` Video component.
+ * On web, renders {@link WebHLSPlayer} using hls.js.
+ *
+ * Route param:
+ * - `id` (string) — identifier of the channel or movie to play.
+ *
+ * Dependencies:
+ * - `useContentStore` — resolves video URL from catalogue.
+ * - `useAdminStore`   — resolves video URL from admin channels.
+ * - `expo-screen-orientation` — native landscape lock.
+ */
 export default function Player() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
