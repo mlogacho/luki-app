@@ -1,7 +1,7 @@
-# Luki Server — Guía de instalación en EC2
+# Luki Server — Guía de instalación en EC2 (Debian)
 
 Backend Node.js + Express + SQLite para la app Luki.  
-Corre en tu instancia EC2 (`ec2-3-135-214-120.us-east-2.compute.amazonaws.com`).
+Corre en tu instancia EC2 con **Debian** (`ec2-3-135-214-120.us-east-2.compute.amazonaws.com`).
 
 ---
 
@@ -31,7 +31,7 @@ Corre en tu instancia EC2 (`ec2-3-135-214-120.us-east-2.compute.amazonaws.com`).
 
 ---
 
-## Paso a paso: instalación en EC2
+## Paso a paso: instalación en EC2 con Debian
 
 ### 1. Conectarse a la instancia
 
@@ -41,41 +41,28 @@ chmod 400 tu-clave.pem
 ssh -i tu-clave.pem admin@3.135.214.120
 ```
 
-> **Usuarios SSH según el AMI:**
-> - Ubuntu / Debian → `admin` o `ubuntu`
-> - Amazon Linux → `ec2-user`
-> - Puedes ver el usuario correcto en la consola de AWS: **EC2 → Instances → Connect → SSH client**.
+> El usuario SSH por defecto en Debian (AWS) es `admin`. Si tu instancia usa otro usuario, cámbialo aquí.
 
 ---
 
-### 2. Detectar el sistema operativo e instalar Node.js 20
-
-Primero averigua qué sistema tienes (dentro del servidor):
+### 2. Instalar Node.js 20
 
 ```bash
-cat /etc/os-release | grep -E "^ID=|^NAME="
-```
+# Actualizar lista de paquetes
+sudo apt-get update
 
-Busca la línea `ID=`:
-- `ID=ubuntu` o `ID=debian` → usa las instrucciones de **Ubuntu/Debian** ↓
-- `ID=amzn` → usa las instrucciones de **Amazon Linux** ↓
+# Instalar dependencias necesarias para añadir el repositorio de NodeSource
+sudo apt-get install -y ca-certificates curl gnupg
 
----
-
-#### ✅ Ubuntu / Debian (la más común en instancias con usuario `admin` o `ubuntu`)
-
-```bash
+# Añadir el repositorio oficial de NodeSource para Node.js 20
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+# Instalar Node.js
 sudo apt-get install -y nodejs
+
+# Verificar la instalación
 node --version   # debe mostrar v20.x.x
-```
-
-#### Amazon Linux 2 / Amazon Linux 2023
-
-```bash
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo yum install -y nodejs
-node --version
+npm --version
 ```
 
 ---
@@ -94,7 +81,6 @@ Desde tu computadora local, ejecuta esto (ajusta la ruta si el repositorio está
 
 ```bash
 # Sube solo la carpeta backend/
-# Reemplaza "admin" por el usuario SSH que usaste en el paso 1
 scp -i tu-clave.pem -r /ruta/local/luki-app/backend admin@3.135.214.120:~/luki-server
 ```
 
