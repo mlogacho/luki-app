@@ -38,26 +38,43 @@ Corre en tu instancia EC2 (`ec2-3-135-214-120.us-east-2.compute.amazonaws.com`).
 ```bash
 # Desde tu computadora, en la carpeta donde guardaste tu .pem
 chmod 400 tu-clave.pem
-ssh -i tu-clave.pem ec2-user@3.135.214.120
+ssh -i tu-clave.pem admin@3.135.214.120
 ```
 
-> Si usas Ubuntu en vez de Amazon Linux, el usuario es `ubuntu` en lugar de `ec2-user`.
+> **Usuarios SSH según el AMI:**
+> - Ubuntu / Debian → `admin` o `ubuntu`
+> - Amazon Linux → `ec2-user`
+> - Puedes ver el usuario correcto en la consola de AWS: **EC2 → Instances → Connect → SSH client**.
 
 ---
 
-### 2. Instalar Node.js 20 (si no está instalado)
+### 2. Detectar el sistema operativo e instalar Node.js 20
 
-**En Amazon Linux 2 / Amazon Linux 2023:**
+Primero averigua qué sistema tienes (dentro del servidor):
+
 ```bash
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo yum install -y nodejs
-node --version   # debe mostrar v20.x.x
+cat /etc/os-release | grep -E "^ID=|^NAME="
 ```
 
-**En Ubuntu:**
+Busca la línea `ID=`:
+- `ID=ubuntu` o `ID=debian` → usa las instrucciones de **Ubuntu/Debian** ↓
+- `ID=amzn` → usa las instrucciones de **Amazon Linux** ↓
+
+---
+
+#### ✅ Ubuntu / Debian (la más común en instancias con usuario `admin` o `ubuntu`)
+
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
+node --version   # debe mostrar v20.x.x
+```
+
+#### Amazon Linux 2 / Amazon Linux 2023
+
+```bash
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo yum install -y nodejs
 node --version
 ```
 
@@ -77,7 +94,8 @@ Desde tu computadora local, ejecuta esto (ajusta la ruta si el repositorio está
 
 ```bash
 # Sube solo la carpeta backend/
-scp -i tu-clave.pem -r /ruta/local/luki-app/backend ec2-user@3.135.214.120:~/luki-server
+# Reemplaza "admin" por el usuario SSH que usaste en el paso 1
+scp -i tu-clave.pem -r /ruta/local/luki-app/backend admin@3.135.214.120:~/luki-server
 ```
 
 ---
