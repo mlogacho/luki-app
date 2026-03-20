@@ -6,6 +6,7 @@ import { useProfileStore } from '@/src/modules/profiles/store/profileStore';
 export default function Index() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
+  const mustChangePassword = useAuthStore((state) => state.mustChangePassword);
   const activeProfile = useProfileStore((state) => state.activeProfile);
 
   if (isLoading) {
@@ -18,6 +19,10 @@ export default function Index() {
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/login" />;
+  }
+
+  if (mustChangePassword) {
+    return <Redirect href="/(auth)/change-password" />;
   }
 
   if (!activeProfile) {

@@ -32,7 +32,6 @@ class HttpClient {
         ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       });
     } catch (err) {
-      clearTimeout(timeoutId);
       throw new AppError('NETWORK_ERROR', 'Sin conexión a internet');
     } finally {
       clearTimeout(timeoutId);

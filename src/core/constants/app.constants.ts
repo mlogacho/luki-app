@@ -10,9 +10,12 @@ export const APP_CONSTANTS = {
 
 export const ROUTES = {
   LOGIN: '/(auth)/login',
+  CHANGE_PASSWORD: '/(auth)/change-password',
   SELECT_PROFILE: '/(app)/select-profile',
   HOME: '/(app)/(tabs)/home',
   PLAYER: '/(app)/player/[id]',
   ADMIN: '/admin',
+  ADMIN_PANEL: '/admin/panel',
+  ADMIN_USERS: '/admin/users',
   UPGRADE: '/(app)/upgrade',
 } as const;

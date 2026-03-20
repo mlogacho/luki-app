@@ -18,6 +18,11 @@ interface RefreshResponse {
   refreshToken: string;
 }
 
+interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export const authApi = {
   login: (req: LoginRequest): Promise<LoginResponse> =>
     httpClient.post<LoginResponse>('/auth/login', req),
@@ -30,4 +35,7 @@ export const authApi = {
 
   getMe: (): Promise<User> =>
     httpClient.get<User>('/auth/me'),
+
+  changePassword: (req: ChangePasswordRequest): Promise<void> =>
+    httpClient.post<void>('/auth/change-password', req),
 };

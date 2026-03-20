@@ -86,7 +86,28 @@ export default function AdminPanel() {
           </View>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {/* Users button */}
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#2A0E47',
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 14,
+              paddingVertical: 9,
+              borderRadius: 10,
+              gap: 6,
+              borderWidth: 1,
+              borderColor: '#3D1A6E',
+            }}
+            onPress={() => router.push('/admin/users' as never)}
+          >
+            <FontAwesome name="users" size={14} color="#FFC107" />
+            <Text style={{ color: '#FFC107', fontWeight: '700', fontSize: 14 }}>
+              Usuarios
+            </Text>
+          </TouchableOpacity>
+          {/* Add channel button */}
           <TouchableOpacity
             style={{
               backgroundColor: '#FFC107',
