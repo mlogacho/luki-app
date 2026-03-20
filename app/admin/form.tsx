@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-    View, Text, TextInput, TouchableOpacity, ScrollView, Image,
-    Platform, ActivityIndicator, SafeAreaView, KeyboardAvoidingView,
-    Alert,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  Platform,
+  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useAdminStore } from '../../services/adminStore';
+import { useAdminStore } from '@/services/adminStore';
+import { useIsAdmin } from '@/src/shared/hooks/useRole';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 type ImageMode = 'url' | 'upload';
@@ -63,7 +72,8 @@ const ERROR_STYLE = { color: '#f87171', fontSize: 12, marginTop: 5 } as const;
 export default function AdminForm() {
     const { id } = useLocalSearchParams<{ id?: string }>();
     const router = useRouter();
-    const { channels, addChannel, updateChannel, isAdminAuth } = useAdminStore();
+    const { channels, addChannel, updateChannel } = useAdminStore();
+    const isAdminAuth = useIsAdmin();
 
     const existing = id ? channels.find((c) => c.id === id) : null;
     const isEditing = !!existing;
@@ -80,7 +90,7 @@ export default function AdminForm() {
 
     // Route protection
     useEffect(() => {
-        if (!isAdminAuth) router.replace('/admin' as any);
+        if (!isAdminAuth) router.replace('/admin' as never);
     }, [isAdminAuth]);
 
     const toggleTag = (tag: string) => {
@@ -141,7 +151,7 @@ export default function AdminForm() {
             addChannel(data);
         }
         setSaving(false);
-        router.replace('/admin/panel' as any);
+        router.replace('/admin/panel' as never);
     };
 
     return (

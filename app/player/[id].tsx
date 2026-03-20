@@ -1,10 +1,10 @@
-import { View, TouchableOpacity, Platform } from 'react-native';
+import { View, TouchableOpacity, Platform, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ResizeMode, Video } from 'expo-av';
 import { useState, useRef, useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useContentStore } from '../../services/contentStore';
-import { useAdminStore } from '../../services/adminStore';
+import { useContentStore } from '@/src/modules/content/store/contentStore';
+import { useAdminStore } from '@/services/adminStore';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 
@@ -66,7 +66,7 @@ export default function Player() {
     const router = useRouter();
     const videoRef = useRef<Video>(null);
     const [status, setStatus] = useState<any>({});
-    const { getMovieById, featured: hardcodedFeatured } = useContentStore();
+    const { getChannelById, featuredChannel } = useContentStore();
     const adminChannels = useAdminStore((state) => state.channels);
 
     // Lock to landscape on native
@@ -80,11 +80,30 @@ export default function Player() {
 
     // Resolve video URL: check admin channels first, then content store
     const adminChannel = id ? adminChannels.find((ch) => ch.id === id) : null;
-    const storeMovie = id ? getMovieById(id as string) : null;
-    const fallbackUrl = 'https://g2qd3e2ay7an-hls-live.5centscdn.com/channel35/d0dbe915091d400bd8ee7f27f0791303.sdp/playlist.m3u8';
-    const videoUrl = adminChannel?.videoUrl ?? storeMovie?.videoUrl ?? hardcodedFeatured?.videoUrl ?? fallbackUrl;
+    const storeChannel = id ? getChannelById(id as string) : undefined;
+    const videoUrl = adminChannel?.videoUrl ?? storeChannel?.videoUrl ?? featuredChannel?.videoUrl ?? '';
 
     const handleBack = () => router.back();
+
+    // Show error if no valid URL is available
+    if (!videoUrl) {
+        return (
+            <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
+                <StatusBar hidden />
+                <TouchableOpacity
+                    style={{ position: 'absolute', top: 40, left: 40, backgroundColor: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 20 }}
+                    onPress={handleBack}
+                >
+                    <FontAwesome name="arrow-left" size={24} color="white" />
+                </TouchableOpacity>
+                <FontAwesome name="exclamation-triangle" size={48} color="#FFC107" />
+                {/* eslint-disable-next-line react-native/no-inline-styles */}
+                <Text style={{ color: 'white', marginTop: 16, fontSize: 16 }}>
+                    No se pudo cargar el video
+                </Text>
+            </View>
+        );
+    }
 
     // Use web HLS player on browser
     if (Platform.OS === 'web') {

@@ -1,28 +1,28 @@
-import { View, Text, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useAuthStore } from '../services/authStore';
-import { useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { Redirect } from 'expo-router';
+import { useAuthStore } from '@/src/modules/auth/store/authStore';
+import { useProfileStore } from '@/src/modules/profiles/store/profileStore';
 
 export default function Index() {
-    const user = useAuthStore((state) => state.user);
-    const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const activeProfile = useProfileStore((state) => state.activeProfile);
 
-    useEffect(() => {
-        // Short timeout to ensure navigation is ready
-        const timer = setTimeout(() => {
-            if (user) {
-                router.replace('/(app)/home');
-            } else {
-                router.replace('/(auth)/login');
-            }
-        }, 100);
-        return () => clearTimeout(timer);
-    }, [user]);
-
+  if (isLoading) {
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFD700' }}>
-            <ActivityIndicator size="large" color="#000000" />
-            <Text style={{ color: 'black', marginTop: 20, fontSize: 20, fontWeight: 'bold' }}>DEBUG MODE: JS IS RUNNING</Text>
-        </View>
+      <View className="flex-1 items-center justify-center bg-black">
+        <ActivityIndicator size="large" color="#FFD700" />
+      </View>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/login" />;
+  }
+
+  if (!activeProfile) {
+    return <Redirect href="/(app)/select-profile" />;
+  }
+
+  return <Redirect href="/(app)/home" />;
 }

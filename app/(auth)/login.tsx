@@ -1,106 +1,121 @@
-import { View, Text, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { useAuthStore } from '../../services/authStore';
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
-import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
+import { useAuthStore } from '@/src/modules/auth/store/authStore';
+import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
+import { StatusBar } from 'expo-status-bar';
+import { isValidEmail, isValidPassword } from '@/src/core/utils/validation.utils';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('12345');
-    const [error, setError] = useState('');
-    const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const router = useRouter();
 
-    const { login, isLoading } = useAuthStore();
+  const { login, isLoading, error, clearError } = useAuthStore();
 
-    const handleLogin = async () => {
-        try {
-            setError('');
+  const handleLogin = async () => {
+    clearError();
+    setValidationError('');
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                setError('Por favor ingresa un correo electrónico válido');
-                return;
-            }
+    if (!isValidEmail(email)) {
+      setValidationError('Por favor ingresa un correo electrónico válido');
+      return;
+    }
 
-            if (!password) {
-                setError('La contraseña es requerida');
-                return;
-            }
+    if (!isValidPassword(password)) {
+      setValidationError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
 
-            await login(email, password);
-            router.replace('/(app)/home');
-        } catch (e) {
-            setError('Credenciales inválidas');
-        }
-    };
+    try {
+      await login(email, password);
+      router.replace('/(app)/home');
+    } catch {
+      // Error is already stored in authStore.error
+    }
+  };
 
-    const Content = (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-center">
+  const displayError = validationError || error;
 
-            <View className="items-center mb-12">
-                {/* DEBUG BOX: Verify NativeWind */}
-                <View className="w-20 h-20 bg-red-500 mb-4 justify-center items-center">
-                    <Text className="text-white font-bold">DEBUG</Text>
-                </View>
-                <View className="flex-row items-center">
-                    {/* Logo Placeholder Simulation */}
-                    <View className="mr-2">
-                        <View className="w-4 h-4 rounded-full bg-luki-accent mb-1 ml-4" />
-                        <View className="w-4 h-4 rounded-full bg-luki-accent mb-1 text-right" />
-                        <View className="w-4 h-4 rounded-full bg-luki-accent" />
-                    </View>
-                    <Text className="text-6xl font-extrabold text-white tracking-tighter">luki</Text>
-                </View>
-                <Text className="text-gray-300 text-lg tracking-widest uppercase mt-2">tu hogar digital</Text>
-            </View>
+  const Content = (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1 justify-center"
+    >
+      <View className="items-center mb-12">
+        <View className="flex-row items-center">
+          <View className="mr-2">
+            <View className="w-4 h-4 rounded-full bg-luki-accent mb-1 ml-4" />
+            <View className="w-4 h-4 rounded-full bg-luki-accent mb-1 text-right" />
+            <View className="w-4 h-4 rounded-full bg-luki-accent" />
+          </View>
+          <Text className="text-6xl font-extrabold text-white tracking-tighter">
+            luki
+          </Text>
+        </View>
+        <Text className="text-gray-300 text-lg tracking-widest uppercase mt-2">
+          tu hogar digital
+        </Text>
+      </View>
 
-            <View className="bg-black/20 p-6 rounded-2xl backdrop-blur-lg">
-                <Text className="text-2xl font-bold text-white mb-6 text-center">Bienvenido de nuevo</Text>
+      <View className="bg-black/20 p-6 rounded-2xl">
+        <Text className="text-2xl font-bold text-white mb-6 text-center">
+          Bienvenido de nuevo
+        </Text>
 
-                {error ? <Text className="text-red-500 mb-4 text-center bg-red-500/10 p-2 rounded">{error}</Text> : null}
+        {displayError ? (
+          <Text className="text-red-400 mb-4 text-center bg-red-500/10 p-2 rounded">
+            {displayError}
+          </Text>
+        ) : null}
 
-                <Input
-                    placeholder="Correo electrónico"
-                    value={email}
-                    onChangeText={setEmail}
-                    label="Usuario"
-                />
-                <Input
-                    placeholder="Contraseña"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    label="Contraseña"
-                />
+        <Input
+          placeholder="Correo electrónico"
+          value={email}
+          onChangeText={setEmail}
+          label="Usuario"
+        />
+        <Input
+          placeholder="Contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          label="Contraseña"
+        />
 
-                <Button title="Entrar" onPress={handleLogin} isLoading={isLoading} />
+        <Button title="Entrar" onPress={handleLogin} isLoading={isLoading} />
 
-                <View className="mt-6 items-center">
-                    <Text className="text-gray-400">¿Olvidaste tu contraseña?</Text>
-                    <Text className="text-gray-400 mt-4 text-xs">Versión v1.0.0</Text>
-                </View>
-            </View>
+        <View className="mt-6 items-center">
+          <Text className="text-gray-400">¿Olvidaste tu contraseña?</Text>
+          <Text className="text-gray-400 mt-4 text-xs">Versión v1.0.0</Text>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
+  );
 
-        </KeyboardAvoidingView>
-    );
-
-    return (
-        <LinearGradient
-            colors={['#4A148C', '#1A052E']}
-            style={{ flex: 1, justifyContent: 'center', padding: 20 }}
-        >
-            <StatusBar style="light" />
-
-            {Platform.OS === 'web' ? (
-                Content
-            ) : (
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    {Content}
-                </TouchableWithoutFeedback>
-            )}
-        </LinearGradient>
-    );
+  return (
+    <LinearGradient
+      colors={['#4A148C', '#1A052E']}
+      style={{ flex: 1, justifyContent: 'center', padding: 20 }}
+    >
+      <StatusBar style="light" />
+      {Platform.OS === 'web' ? (
+        Content
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          {Content}
+        </TouchableWithoutFeedback>
+      )}
+    </LinearGradient>
+  );
 }

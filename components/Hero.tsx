@@ -1,13 +1,13 @@
 import { View, Text, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Movie } from '../services/contentStore';
 import { useState } from 'react';
+import type { Channel } from '@/src/core/types/channel.types';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 interface HeroProps {
-    movie: Movie;
+    movie: Channel;
     onPlay: () => void;
 }
 
@@ -17,7 +17,7 @@ export const Hero = ({ movie, onPlay }: HeroProps) => {
     return (
         <View className="w-full relative" style={{ height: height * 0.6 }}>
             <ImageBackground
-                source={(!imgError && movie.backdrop) ? { uri: movie.backdrop } : undefined}
+                source={(!imgError && movie.imageUrl) ? { uri: movie.imageUrl } : undefined}
                 style={{ backgroundColor: '#2A0E47' }}
                 className="w-full h-full justify-end"
                 resizeMode="cover"
