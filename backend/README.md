@@ -75,31 +75,35 @@ sudo npm install -g pm2
 
 ---
 
-### 4. Subir el código del servidor a la instancia
+### 4. Clonar el repositorio en la instancia
 
-Desde tu computadora local, **primero ve a la carpeta raíz del repositorio** y luego ejecuta el `scp`:
+En lugar de subir archivos con `scp`, clona el repositorio directamente desde GitHub.
+Desde tu **sesión SSH en el servidor**:
 
 ```bash
-# 1. Entra a la carpeta raíz del repositorio (donde está la subcarpeta backend/)
-cd /ruta/local/luki-app   # ajusta esta ruta a donde clonaste el repo
+# Clona el repositorio completo en ~/luki-app
+git clone https://github.com/mlogacho/luki-app.git ~/luki-app
 
-# 2. Comprueba que la carpeta backend/ existe aquí
-ls backend/
-
-# 3. Sube la carpeta backend/ al servidor
-scp -i bot.pem -r ./backend admin@3.135.214.120:~/luki-server
+# Entra a la carpeta del backend
+cd ~/luki-app/backend
 ```
 
-> ⚠️ El error `No such file or directory` aparece cuando ejecutas el `scp` desde una carpeta
-> que **no** contiene `backend/`. Asegúrate de estar en la raíz del repositorio antes de ejecutar el comando.
+> **Si ya lo clonaste antes** y solo quieres traer los cambios más recientes:
+> ```bash
+> cd ~/luki-app
+> git pull
+> cd backend
+> ```
 
 ---
 
 ### 5. Instalar dependencias en el servidor
 
 ```bash
-# Desde la sesión SSH
-cd ~/luki-server
+# Ya deberías estar en ~/luki-app/backend (del paso anterior)
+# Si no, entra aquí:
+cd ~/luki-app/backend
+
 npm install --production
 ```
 
@@ -159,6 +163,7 @@ Verás en pantalla las credenciales creadas. **Guárdalas**, las necesitas para 
 ### 8. Iniciar el servidor con PM2
 
 ```bash
+# Desde ~/luki-app/backend
 pm2 start src/index.js --name luki-server
 pm2 save
 pm2 startup   # Copia y ejecuta el comando que te muestre para que arranque al reiniciar
@@ -212,6 +217,18 @@ pm2 restart luki-server
 
 # Ver estado
 pm2 status
+```
+
+### Actualizar el servidor desde GitHub
+
+Cuando hagas cambios en el código y los subas a GitHub, aplícalos en el servidor con:
+
+```bash
+cd ~/luki-app
+git pull
+cd backend
+npm install --production   # solo si cambiaron dependencias en package.json
+pm2 restart luki-server
 ```
 
 ---
