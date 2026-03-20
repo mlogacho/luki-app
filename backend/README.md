@@ -75,24 +75,31 @@ sudo npm install -g pm2
 
 ---
 
-### 4. Clonar el repositorio en la instancia
+### 4. Clonar o actualizar el repositorio en la instancia
 
-En lugar de subir archivos con `scp`, clona el repositorio directamente desde GitHub.
-Desde tu **sesión SSH en el servidor**:
+Desde tu **sesión SSH en el servidor**, ejecuta este bloque tal cual —
+detecta automáticamente si ya existe el repositorio:
 
 ```bash
-# Clona el repositorio completo en ~/luki-app
-git clone https://github.com/mlogacho/luki-app.git ~/luki-app
+if [ -d "$HOME/luki-app/.git" ]; then
+  # El repo ya existe → solo traer cambios
+  cd ~/luki-app && git pull
+else
+  # Primera vez → clonar
+  git clone https://github.com/mlogacho/luki-app.git ~/luki-app
+fi
 
-# Entra a la carpeta del backend
+# Entrar al backend
 cd ~/luki-app/backend
 ```
 
-> **Si ya lo clonaste antes** y solo quieres traer los cambios más recientes:
+> **¿Error "already exists and is not an empty directory"?**
+> Significa que hay una carpeta `~/luki-app` pero sin historial de git.
+> Elimínala y vuelve a ejecutar el bloque de arriba:
 > ```bash
-> cd ~/luki-app
-> git pull
-> cd backend
+> rm -rf ~/luki-app
+> git clone https://github.com/mlogacho/luki-app.git ~/luki-app
+> cd ~/luki-app/backend
 > ```
 
 ---
