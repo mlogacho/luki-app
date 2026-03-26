@@ -9,12 +9,29 @@ y el proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Añadido
+- `.github/copilot-instructions.md` — prompt de desarrollo optimizado para GitHub Copilot en VS Code; incluye contexto del proyecto OTT, stack técnico, convenciones de código, infraestructura AWS y guías específicas para el Mundial FIFA 2026
+- `services/favoritesStore.ts` — store Zustand para la lista personal del usuario, con persistencia en IndexedDB via `idb-keyval`
+- `app/(app)/favorites.tsx` — pantalla Mi Lista completamente implementada con estado vacío, lista de títulos guardados, reproducción directa y eliminar de la lista
+- `app/(app)/search.tsx` — pantalla de búsqueda con filtrado en tiempo real por título, descripción y etiquetas; soporte para marcar/desmarcar favoritos directamente desde los resultados
+- Canales de transmisión del **Mundial FIFA 2026** en `contentStore.ts`: hero principal "FIFA Mundial 2026 — En Vivo" y tres canales de partidos con soporte `isLive` y `matchTime`
+- Campos `isLive?: boolean` y `matchTime?: string` en la interfaz `Movie` para diferenciar contenido en vivo
+- Badge "EN VIVO" en `MediaRow` y `Search` para canales live
+- Botón "Mi Lista" / "Guardado" en el componente `Hero` con integración al `favoritesStore`
+- Navegación al reproductor al tocar tarjetas en `MediaRow` (antes era un no-op)
+- Tests unitarios: `tests/favoritesStore.test.ts` (15 tests) y `tests/contentStore.test.ts` (9 tests)
+- Script `"test"` en `package.json` + configuración Jest con preset `jest-expo`
+
+### Modificado
+- `TAG_ORDER` en `home.tsx` reordenado para priorizar "Mundial 2026" y "En Vivo" sobre otros géneros
+- `contentStore.ts`: contenido hero actualizado al canal Mundial 2026; canales World Cup insertados con prioridad entre admin channels y VOD catalogue
+- `components/Hero.tsx`: botón "Info" reemplazado por "Mi Lista" con toggle de favoritos y badge "EN VIVO" para streams live
+- `components/MediaRow.tsx`: tarjetas ahora navegan al reproductor; badge "EN VIVO" visible en canales live
+
 ### Pendiente
-- Implementar pantalla de búsqueda (`app/(app)/search.tsx`)
-- Implementar pantalla Mi Lista / Favoritos (`app/(app)/favorites.tsx`)
 - Autenticación real contra un backend seguro
-- Tests unitarios e integración
-- Monitorización de errores en producción
+- Monitorización de errores en producción (Sentry u otro)
+- Geo-restricciones para canales del Mundial (requiere backend)
 
 ---
 

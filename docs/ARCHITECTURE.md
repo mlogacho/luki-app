@@ -55,8 +55,9 @@ luki-app/
 │   └── MediaRow.tsx          # Fila horizontal de tarjetas de contenido
 ├── services/                 # Capa de estado (Zustand stores)
 │   ├── authStore.ts          # Autenticación de usuario
-│   ├── contentStore.ts       # Catálogo de contenido
-│   └── adminStore.ts         # CRUD de canales administrados
+│   ├── contentStore.ts       # Catálogo de contenido (VOD + Mundial 2026)
+│   ├── adminStore.ts         # CRUD de canales administrados
+│   └── favoritesStore.ts     # Lista personal del usuario (IndexedDB)
 ├── assets/                   # Imágenes y recursos estáticos
 ├── docs/                     # Documentación del proyecto
 ├── scripts/                  # Scripts de automatización
@@ -236,10 +237,12 @@ Definida en `tailwind.config.js` como tokens personalizados:
 | Área | Estado |
 |---|---|
 | Autenticación de usuario | Prototipo (mock) |
-| Catálogo de contenido | Prototipo (hardcodeado + admin channels) |
+| Catálogo de contenido | Funcional (hardcodeado + admin channels + canales Mundial 2026) |
 | Reproductor de video | Funcional (HLS web + expo-av nativo) |
 | Panel admin CRUD | Funcional |
-| Búsqueda | Pendiente (`app/(app)/search.tsx`) |
-| Mi Lista / Favoritos | Pendiente (`app/(app)/favorites.tsx`) |
-| Tests automatizados | Pendiente (`tests/`) |
+| Búsqueda | Funcional (`app/(app)/search.tsx`) |
+| Mi Lista / Favoritos | Funcional — persistido en IndexedDB (`app/(app)/favorites.tsx`) |
+| Tests automatizados | Funcional — `tests/favoritesStore.test.ts`, `tests/contentStore.test.ts` |
 | Backend/API real | Pendiente |
+| Autenticación en producción (AWS Cognito) | Pendiente |
+| Streaming en vivo Mundial 2026 (AWS MediaLive) | Pendiente (canales placeholder listos) |

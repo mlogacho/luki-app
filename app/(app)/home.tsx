@@ -10,7 +10,10 @@ import { useRouter } from 'expo-router';
 // Order in which tag rows appear when present
 const TAG_ORDER = [
     'Tendencias Globales',
-    'Acción', 'Aventura', 'Deportes', 'Noticias', 'Entretenimiento',
+    'Mundial 2026',
+    'En Vivo',
+    'Deportes', 'Noticias', 'Entretenimiento',
+    'Acción', 'Aventura',
     'Películas', 'Series', 'Música', 'Infantil', 'Documentales',
     'Comedia', 'Terror', 'Drama', 'Sci-Fi', 'Anime',
 ];
