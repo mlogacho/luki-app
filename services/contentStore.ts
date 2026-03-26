@@ -12,6 +12,8 @@ import { useAdminStore } from './adminStore';
  * @property videoUrl    - HLS (.m3u8), MP4, or live stream URL.
  * @property rating      - Optional audience relevance score label.
  * @property tags        - Genre or category labels for display rows.
+ * @property isLive      - When true the stream is a live broadcast.
+ * @property matchTime   - Scheduled kick-off time (e.g. "18:00 ECT") for live events.
  */
 export interface Movie {
     id: string;
@@ -22,6 +24,8 @@ export interface Movie {
     videoUrl: string; // HLS
     rating?: string;
     tags?: string[];
+    isLive?: boolean;
+    matchTime?: string;
 }
 
 /**
@@ -67,16 +71,56 @@ export const useContentStore = create<ContentState>((set, get) => ({
         // Simulate delay
         await new Promise(r => setTimeout(r, 100));
 
+        /** Placeholder HLS stream used for prototype channels. */
+        const DEMO_STREAM = 'https://g2qd3e2ay7an-hls-live.5centscdn.com/channel35/d0dbe915091d400bd8ee7f27f0791303.sdp/playlist.m3u8';
+
         const featured: Movie = {
-            id: 'hero-1',
-            title: 'Cyberpunk Edgerunners',
-            poster: 'https://image.tmdb.org/t/p/w500/7WJjFviFBffEJvkAms4uWwbcVUk.jpg',
-            backdrop: 'https://image.tmdb.org/t/p/original/5DUMPBSnHOZsbBv81GFXZxWBj8o.jpg', // Wide image
-            description: 'In a dystopia riddled with corruption and cybernetic implants, a talented but reckless street kid strives to become a mercenary outlaw — an edgerunner.',
-            videoUrl: 'https://g2qd3e2ay7an-hls-live.5centscdn.com/channel35/d0dbe915091d400bd8ee7f27f0791303.sdp/playlist.m3u8',
-            rating: '98% Relevant',
-            tags: ['Sci-Fi', 'Anime', 'Action']
+            id: 'hero-mundial-2026',
+            title: 'FIFA Mundial 2026 — En Vivo',
+            poster: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/2026_FIFA_World_Cup_logo.svg/800px-2026_FIFA_World_Cup_logo.svg.png',
+            backdrop: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/2026_FIFA_World_Cup_logo.svg/800px-2026_FIFA_World_Cup_logo.svg.png',
+            description: 'Vive la emoción del Mundial FIFA 2026 en LUKI. 104 partidos desde USA, Canadá y México. Transmisión en HD exclusiva para suscriptores LUKI.',
+            videoUrl: DEMO_STREAM,
+            rating: '100% Relevante',
+            tags: ['Mundial 2026', 'En Vivo', 'Deportes'],
+            isLive: true,
         };
+
+        /** FIFA World Cup 2026 live match channels (prototype). */
+        const worldCupChannels: Movie[] = [
+            {
+                id: 'wc2026-1',
+                title: 'Ecuador vs Grupo A — EN VIVO',
+                poster: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Flag_of_Ecuador.svg/320px-Flag_of_Ecuador.svg.png',
+                backdrop: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Flag_of_Ecuador.svg/800px-Flag_of_Ecuador.svg.png',
+                description: 'Partido de la selección ecuatoriana en la fase de grupos del Mundial 2026.',
+                videoUrl: DEMO_STREAM,
+                tags: ['Mundial 2026', 'En Vivo', 'Deportes'],
+                isLive: true,
+                matchTime: '18:00 ECT',
+            },
+            {
+                id: 'wc2026-2',
+                title: 'Canal Deportes LUKI — EN VIVO',
+                poster: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/FIFA_World_Cup_Trophy.svg/200px-FIFA_World_Cup_Trophy.svg.png',
+                backdrop: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/FIFA_World_Cup_Trophy.svg/800px-FIFA_World_Cup_Trophy.svg.png',
+                description: 'Canal oficial de deportes LUKI con cobertura 24/7 del Mundial FIFA 2026.',
+                videoUrl: DEMO_STREAM,
+                tags: ['Mundial 2026', 'En Vivo', 'Deportes'],
+                isLive: true,
+            },
+            {
+                id: 'wc2026-3',
+                title: 'Cuartos de Final — EN VIVO',
+                poster: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/FIFA_World_Cup_Trophy.svg/200px-FIFA_World_Cup_Trophy.svg.png',
+                backdrop: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/FIFA_World_Cup_Trophy.svg/800px-FIFA_World_Cup_Trophy.svg.png',
+                description: 'Transmisión en vivo de los cuartos de final del Mundial 2026.',
+                videoUrl: DEMO_STREAM,
+                tags: ['Mundial 2026', 'En Vivo', 'Deportes'],
+                isLive: true,
+                matchTime: '15:00 ECT',
+            },
+        ];
 
         const movieTemplate = (id: string, title: string, img: string): Movie => ({
             id,
@@ -84,7 +128,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
             poster: img,
             backdrop: img,
             description: 'Movie description...',
-            videoUrl: 'https://g2qd3e2ay7an-hls-live.5centscdn.com/channel35/d0dbe915091d400bd8ee7f27f0791303.sdp/playlist.m3u8',
+            videoUrl: DEMO_STREAM,
         });
 
         const trending = [
@@ -106,8 +150,9 @@ export const useContentStore = create<ContentState>((set, get) => ({
             tags: ch.tags || [],
         }));
 
+        // Priority order: admin channels → World Cup live → VOD catalogue
         const activeFeatured = adminMovies.length > 0 ? adminMovies[0] : featured;
-        const activeTrending = [...adminMovies, ...trending];
+        const activeTrending = [...adminMovies, ...worldCupChannels, ...trending];
 
         set({
             featured: activeFeatured,
